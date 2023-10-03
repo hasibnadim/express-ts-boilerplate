@@ -1,6 +1,3 @@
 node_modules/
 build/
-logs
-cache/**
 .env
-src/app/.notes

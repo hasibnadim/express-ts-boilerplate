@@ -1,28 +1,27 @@
-//
-
 import { PrismaClient } from "@prisma/client";
-import { env } from "./common.service";
-import { queryLog } from "./logger.service";
 
-export const prismax = new PrismaClient();
+import { env } from "../utils/func.utils";
+
+const prismax = new PrismaClient();
 
 prismax.$use(async (params, next) => {
   var result;
   // try {
   result = await next(params);
-  queryLog({ model: params.model, action: params.action, status: "DONE" });
+
+  // queryLog({ model: params.model, action: params.action, status: "DONE" });
   // } catch (error) {}
 
   return result;
 });
 
-prismax.$on("beforeExit", () => {
-  prismax.$disconnect();
-});
-
-export const connectdb = async () => {
+const connectdb = async () => {
   try {
     await prismax.$connect();
+    process.on("beforeExit", () => {
+      prismax.$disconnect();
+      console.log("Disconnected from database.");
+    });
     console.log(`🚀 Database connected ${PrismaClient.name}.`);
   } catch (error) {
     console.log(
@@ -37,3 +36,4 @@ export const connectdb = async () => {
     }
   }
 };
+export { prismax, connectdb };
